@@ -1,100 +1,56 @@
-# -*- coding: utf-8 -*-
-"""
-Laboratorio 3 — Modelado y Simulación
-Problema 2: Newton–Raphson 1D para hallar extremos locales y globales de
-    f(x) = x^5 - 8x^3 + 10x + 6   en el intervalo [-3, 3].
-
-REQUISITOS:
-- Implementación manual (sin librerías de optimización).
-- Uso exclusivo de NumPy, SymPy y Matplotlib.
-- Gráficas y análisis incluidos.
-
-Autor: [Tu nombre]
-"""
-
-# =====================================================================
-# 1) Importación de librerías y definición simbólica
-# =====================================================================
-
 import numpy as np
 import sympy as sp
 import matplotlib.pyplot as plt
 
-# Variable simbólica
+#Variable simbólica
 x = sp.Symbol('x', real=True)
 
-# Función objetivo del problema
+#Función objetivo del problema
 f_sym = x**5 - 8*x**3 + 10*x + 6
 
-# Derivadas analíticas
-f1_sym = sp.diff(f_sym, x)   # Primera derivada f'(x)
-f2_sym = sp.diff(f1_sym, x)  # Segunda derivada f''(x)
+#Derivadas analíticas
+f1_sym = sp.diff(f_sym, x)   #Primera derivada f'(x)
+f2_sym = sp.diff(f1_sym, x)  #Segunda derivada f''(x)
 
-# Conversión a funciones numéricas (para cálculos con NumPy)
+#Conversión a funciones numéricas 
 f  = sp.lambdify(x, f_sym,  'numpy')
 f1 = sp.lambdify(x, f1_sym, 'numpy')
 f2 = sp.lambdify(x, f2_sym, 'numpy')
 
 
-# =====================================================================
-# 2) Método de Newton–Raphson para encontrar extremos locales
-# =====================================================================
+#Método de Newton–Raphson para encontrar extremos locales
 
 def newton_extremo_1d(f1, f2, x0, alpha=0.8, tol=1e-10, max_iter=200):
     """
     Aplica el método de Newton–Raphson para resolver f'(x)=0, es decir,
     encontrar puntos críticos de f(x).
-
-    Parámetros
-    ----------
-    f1, f2 : funciones
-        Derivadas de primer y segundo orden de f(x).
-    x0 : float
-        Valor inicial (semilla).
-    alpha : float
-        Factor de amortiguación (0 < alpha <= 1) que controla la magnitud del paso.
-    tol : float
-        Tolerancia sobre |f'(x)| para detener el proceso iterativo.
-    max_iter : int
-        Máximo número de iteraciones permitido.
-
-    Retorna
-    -------
-    xk : float
-        Aproximación al punto crítico.
-    iters : int
-        Iteraciones realizadas.
-    converged : bool
-        Verdadero si |f'(x)| < tol.
-    history : list[float]
-        Secuencia de valores x_k para analizar la convergencia.
     """
 
-    xk = float(x0)          # Inicialización
+    xk = float(x0)          #Inicialización
     history = [xk]
 
     for k in range(max_iter):
-        g = f1(xk)          # Derivada primera f'(x_k)
-        H = f2(xk)          # Derivada segunda f''(x_k)
+        g = f1(xk)          #Derivada primera f'(x_k)
+        H = f2(xk)          #Derivada segunda f''(x_k)
 
-        # Evitar división por cero o Hessiana mal condicionada
+        #Evitar división por cero o Hessiana mal condicionada
         if not np.isfinite(H) or abs(H) < 1e-14:
             return xk, k, False, history
 
-        # Paso de Newton amortiguado
+        #Paso de Newton amortiguado
         step = - alpha * g / H
         xk = xk + step
         history.append(float(xk))
 
-        # Criterio de convergencia: derivada próxima a cero
+        #Criterio de convergencia: derivada próxima a cero
         if abs(f1(xk)) < tol:
             return xk, k+1, True, history
 
-        # Prevención de valores no finitos o divergentes
+        #Prevención de valores no finitos o divergentes
         if not np.isfinite(xk) or abs(xk) > 1e6:
             return xk, k+1, False, history
 
-    # Si no converge en max_iter, se retorna el último valor
+    #Si no converge en max_iter, se retorna el último valor
     return xk, max_iter, False, history
 
 
@@ -104,16 +60,14 @@ def clasificar_extremo(f2, xc, eps=1e-8):
     """
     H = f2(xc)
     if H > eps:
-        return "min"   # Mínimo local
+        return "min"   #Mínimo local
     elif H < -eps:
-        return "max"   # Máximo local
+        return "max"   #Máximo local
     else:
         return "plano/indeterminado"
 
 
-# =====================================================================
-# 3) Barrido de semillas en [-3, 3]
-# =====================================================================
+#Barrido de semillas en [-3, 3]
 
 def explorar_intervalo(a=-3, b=3, n_seeds=49, alpha=0.8, tol=1e-10, max_iter=200):
     """
@@ -130,7 +84,7 @@ def explorar_intervalo(a=-3, b=3, n_seeds=49, alpha=0.8, tol=1e-10, max_iter=200
         if ok and (a - 1e-8) <= xc <= (b + 1e-8):
             hallados.append(xc)
 
-    # Agrupar resultados únicos (para evitar duplicados)
+    #Agrupar resultados únicos 
     unicos = []
     for xc in hallados:
         if not any(abs(xc - u) <= 1e-6 for u in unicos):
@@ -148,9 +102,7 @@ def explorar_intervalo(a=-3, b=3, n_seeds=49, alpha=0.8, tol=1e-10, max_iter=200
     return resultados, seeds, trayectorias
 
 
-# =====================================================================
-# 4) Cálculo de extremos globales en [-3,3]
-# =====================================================================
+#Cálculo de extremos globales en [-3,3]
 
 def extremos_globales(resultados, a=-3, b=3):
     """
@@ -166,9 +118,7 @@ def extremos_globales(resultados, a=-3, b=3):
     return gmin, gmax, candidatos
 
 
-# =====================================================================
-# 5) Visualización de resultados
-# =====================================================================
+#Visualización de resultados
 
 def plot_funcion_y_extremos(resultados, global_min, global_max,
                             a=-3, b=3, filename='problema2_funcion_extremos.png'):
@@ -182,12 +132,12 @@ def plot_funcion_y_extremos(resultados, global_min, global_max,
     plt.figure(figsize=(8, 5))
     plt.plot(X, Y, label='f(x)')
 
-    # Puntos críticos locales
+    #Puntos críticos locales
     for r in resultados:
         marker = {'min': 'o', 'max': 's'}.get(r['tipo'], 'x')
         plt.plot(r['x'], r['f(x)'], marker=marker, markersize=7, label=r['tipo'])
 
-    # Puntos globales (borde)
+    #Puntos globales 
     plt.plot(global_min[0], global_min[1], marker='v', markersize=10, label='mínimo global')
     plt.plot(global_max[0], global_max[1], marker='^', markersize=10, label='máximo global')
 
@@ -220,9 +170,6 @@ def plot_trayectorias(trayectorias, filename='problema2_trayectorias.png'):
     plt.close()
 
 
-# =====================================================================
-# 6) Función principal
-# =====================================================================
 
 def main():
     a, b = -3, 3
@@ -230,11 +177,11 @@ def main():
     tol = 1e-10
     n_seeds = 49
 
-    # Ejecución del método
+    #Ejecución del método
     resultados, seeds, trayectorias = explorar_intervalo(a, b, n_seeds, alpha, tol)
     gmin, gmax, candidatos = extremos_globales(resultados, a, b)
 
-    # Reporte de resultados
+    #Reporte de resultados
     print("Puntos críticos locales encontrados en [-3,3]:")
     for r in resultados:
         print(f"x* = {r['x']:.10f}\t f(x*) = {r['f(x)']:.10f}\t tipo = {r['tipo']}")
@@ -248,13 +195,12 @@ def main():
     print("Máximo global:\n  x ≈ {:.10f},  f(x) ≈ {:.10f} ({})"
           .format(gmax[0], gmax[1], gmax[2]))
 
-    # Generar figuras
+    #Generar figuras
     plot_funcion_y_extremos(resultados, gmin, gmax, a, b)
     plot_trayectorias(trayectorias)
 
 
-# =====================================================================
-# Ejecución directa
-# =====================================================================
+
+#main
 if __name__ == "__main__":
     main()
