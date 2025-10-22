@@ -85,7 +85,5 @@ for a, tray in trayectorias.items():
 
 print("\nSolución analítica: (x*, y*) = (2, -1), L* = 0")
 
-# 6. COMENTARIO DE ANÁLISIS (para reporte)
-
 if __name__ == "__main__":
     pass
