@@ -1,23 +1,11 @@
-"""
-Problema: Gradiente Descendente en 2D
--------------------------------------
-1. Cálculo analítico del gradiente de L(x, y) = (x - 2)^2 + (y + 1)^2
-2. Implementación del algoritmo de Gradiente Descendente
-3. Experimentación con distintos α (tasas de aprendizaje)
-4. Gráfica de las trayectorias y guardado de la figura
-5. Comparación con el mínimo analítico
-6. Análisis de sensibilidad (para incluir en reporte)
-"""
-
 from __future__ import annotations
 import numpy as np
 import sympy as sp
 import matplotlib.pyplot as plt
 import os
 
-# ===============================
-# 1. CÁLCULO ANALÍTICO DEL GRADIENTE
-# ===============================
+
+# 1.CALCULO ANALITICO DEL GRADIENTE
 
 x, y = sp.symbols('x y', real=True)
 L_sym = (x - 2)**2 + (y + 1)**2
@@ -35,9 +23,8 @@ print()
 L = sp.lambdify((x, y), L_sym, 'numpy')
 grad_L = sp.lambdify((x, y), (dL_dx, dL_dy), 'numpy')
 
-# ===============================
-# 2. ALGORITMO DE GRADIENTE DESCENDENTE
-# ===============================
+
+# 2.ALGORITMO DE GRADIENTE DESCENDENTE
 
 def gradient_descent(alpha: float, n_iter: int = 30, start: tuple = (0, 0)) -> np.ndarray:
     xk, yk = start
@@ -51,16 +38,14 @@ def gradient_descent(alpha: float, n_iter: int = 30, start: tuple = (0, 0)) -> n
 
     return np.array(trayectoria)
 
-# ===============================
-# 3. EXPERIMENTAR CON DIFERENTES α
-# ===============================
+
+# 3.EXPERIMENTAR CON DIFERENTES α
 
 alphas = [0.05, 0.1, 0.3, 0.6, 1.0]
 trayectorias = {a: gradient_descent(a) for a in alphas}
 
-# ===============================
-# 4. GRAFICAR Y GUARDAR FIGURA
-# ===============================
+
+# 4.GRAFICAR Y GUARDAR FIGURA
 
 def plot_trayectorias(trayectorias, filename="problema_gradiente_trayectorias.png"):
     # Crear malla de la función para contornos
@@ -88,14 +73,12 @@ def plot_trayectorias(trayectorias, filename="problema_gradiente_trayectorias.pn
     ruta_salida = os.path.join(os.getcwd(), filename)
     plt.savefig(ruta_salida, dpi=160)
     plt.close()
-    print(f"✅ Figura guardada en: {ruta_salida}")
 
 # Guardar la figura
 plot_trayectorias(trayectorias)
 
-# ===============================
-# 5. RESULTADOS FINALES
-# ===============================
+
+# 5.RESULTADOS FINALES
 
 for a, tray in trayectorias.items():
     xf, yf = tray[-1]
@@ -104,25 +87,6 @@ for a, tray in trayectorias.items():
 
 print("\nSolución analítica: (x*, y*) = (2, -1), L* = 0")
 
-# ===============================
-# 6. COMENTARIO DE ANÁLISIS (para reporte)
-# ===============================
-"""
-Análisis sugerido (para el documento):
---------------------------------------
-- α pequeños (0.05, 0.1): convergencia estable pero lenta.
-- α medio (0.3): rápida convergencia al mínimo.
-- α grandes (0.6 o 1.0): el algoritmo oscila o diverge.
-- Rango teórico estable: 0 < α < 1 (dado que λ_max(H) = 2).
 
-Estrategias para seleccionar α:
-- Búsqueda empírica: probar varios valores.
-- Decrecimiento adaptativo: α_t = α0 / (1 + k*t)
-- Métodos adaptativos (Adam, RMSProp, etc.)
-- Criterio teórico: α < 2 / λ_max(H)
-"""
-# ===============================
-# FIN DEL PROGRAMA
-# ===============================
 if __name__ == "__main__":
     pass
