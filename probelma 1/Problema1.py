@@ -22,13 +22,13 @@ def newton_extremo_1d(f1, f2, x0: float, alpha: float = 1.0,
                       tol: float = 1e-8, max_iter: int = 100):
  
     xk = float(x0)            #Convertimos a float por seguridad
-    history = [xk]            #Guardamos la trayectoria para graficar/analizar
+    history = [xk]            #trayectoria para graficar/analizar
 
     for k in range(max_iter):
-        g = f1(xk)            #g = f'(x_k)    (debe tender a 0 en el óptimo)
-        H = f2(xk)            #H = f''(x_k)   (curvatura local)
+        g = f1(xk)            #g = f'(x_k)    
+        H = f2(xk)            #H = f''(x_k)   
 
-        #Si H ~ 0 o no es finito, no podemos dar un paso de Newton
+        #Si H ~ 0 o no es finito, no se puede dar un paso de Newton
         if not np.isfinite(H) or abs(H) < 1e-14:
             return xk, k, False, history
 
@@ -61,10 +61,7 @@ def clasificar_extremo(f2, xc: float, eps: float = 1e-8) -> str:
 #Barrido de semillas en [-6, 6]
 def explorar_intervalo(a: float = -6, b: float = 6, n_seeds: int = 31,
                        alpha: float = 0.8, tol: float = 1e-10, max_iter: int = 100):
-    """
-    Lanza Newton desde múltiples semillas equiespaciadas en [a,b].
-    Agrupa soluciones por cercanía para reportar puntos críticos únicos.
-    """
+   
     seeds = np.linspace(a, b, n_seeds)
     hallados = []      #(xc, it, ok)
     trayectorias = []  #lista de historiales x_k
@@ -130,7 +127,7 @@ def plot_trayectorias(trayectorias, filename='problema1_trayectorias.png'):
     plt.savefig(filename, dpi=160)
     plt.close()
 
-# ================================== 5) main ==================================
+#main
 def main():
     
     a, b      = -6, 6
